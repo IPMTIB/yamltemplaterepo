@@ -1,0 +1,137 @@
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry and imagePullSecrets
+##
+# global:
+#   imageRegistry: myRegistryName
+#   imagePullSecrets:
+#     - myRegistryKeySecretName
+#   storageClass: myStorageClass
+
+
+##
+
+image:
+  registry: "150219881234"
+  repository: tibbwce:savingaccountservice
+  tag: v2
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  ##pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  # pullSecrets:
+  #   - myRegistryKeySecretName
+  ## Set to true if you would like to see extra information on logs
+  ##
+  ##debug: false
+  
+appName: savingaccountservice
+  
+deploymentAnnotations:
+   techOwner: biman.bisws@cognizant.com,barun.roy@cognizant.com
+   sourceCodeRepo: https://github.com/amitmohanty15feb1988/SavingsAccountService
+      
+customLabels:
+   app: savingaccountservice
+   tier: middleware
+   environment: DEV
+   projectId: prj-001
+   costCenter: cs-001    
+
+## Set up update strategy for application installation. Set to Recreate if you use persistent volume that cannot be mounted by more than one pods to makesure the pods is destroyed first.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+## Example:
+## updateStrategy:
+##  type: RollingUpdate
+##  rollingUpdate:
+##    maxSurge: 25%
+##    maxUnavailable: 25%
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+     maxSurge: 25%
+     maxUnavailable: 25%
+
+#deploymentPorts     
+ports:
+  - containerPort: 8080
+    name: application
+    protocol: TCP
+  - containerPort: 8090
+    name: monitoring
+    protocol: TCP
+  - containerPort: 9095
+    name: prometheus
+    protocol: TCP   
+
+replicaCount: 1
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1024Mi"
+    cpu: "500m"
+
+
+## pod extra options for liveness and readiness probes
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
+livenessProbe:
+  initialDelaySeconds: 120
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 5
+  successThreshold: 1
+  httpGet:
+     path: /savings-account/v2/savings-account/savings-account-fulfillment-arrangement/behavior-qualifiers
+     port: 8080
+     scheme: HTTP
+     httpHeaders:
+     - name: Authorization
+       value: "Basic YWRtaW46c2VjcmV0"
+      
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 1
+  successThreshold: 5
+  httpGet:
+    path: /savings-account/v2/savings-account/savings-account-fulfillment-arrangement/behavior-qualifiers
+    port: 8080
+    scheme: HTTP
+    httpHeaders:
+     - name: Authorization
+       value: "Basic YWRtaW46c2VjcmV0"
+
+## If using an HTTPS-terminating load-balancer, the probes may need to behave
+## like the balancer to prevent HTTP 302 responses. According to the Kubernetes
+## docs, 302 should be considered "successful", but this issue on GitHub
+## (https://github.com/kubernetes/kubernetes/issues/47893) shows that it isn't.
+
+## Kubernetes configuration
+## For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP
+##
+service:
+  type: LoadBalancer
+  ## Node Ports to expose
+  nodePorts:
+   - port: 80
+     targetPort: 8080
+     protocol: TCP
+     name: application
+   - port: 8090
+     targetPort: 8090
+     protocol: TCP
+     name: monitoring
+   - port: 9095
+     targetPort: 9095
+     protocol: TCP
+     name: prometheus 
+  
