@@ -1,7 +1,7 @@
 image:
   registry: '150219881234'
-  repository: tibbwce:savingaccountservice
-  tag: v2
+  repository: 150219881234/tibbwce
+  tag: savingaccountservice_v2
 appName: savingaccountservice
 deploymentAnnotations:
   techOwner: biman.bisws@cognizant.com,barun.roy@cognizant.com
