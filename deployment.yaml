@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: {{.Values.appName}}
-          image: {{.Values.image.registry}}/{{.Values.image.repository}}_{{.Values.image.tag}}
+          image: {{.Values.image.registry}}/{{.Values.image.repository}}:BUILD{{.Values.image.tag}}
           envFrom:
           - configMapRef:
                 name: {{.Values.appName}}-cfg
