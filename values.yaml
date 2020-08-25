@@ -6,13 +6,13 @@ appName: savingaccountservice
 deploymentAnnotations:
   techOwner: biman.bisws@cognizant.com,barun.roy@cognizant.com
   sourceCodeRepo: https://github.com/amitmohanty15feb1988/SavingsAccountService
+  buildno: build-01
 customLabels:
   app: savingaccountservice
   tier: middleware
   environment: DEV
   projectId: prj-001
   costCenter: cs-001
-  buildno: build-01
 updateStrategy:
   type: RollingUpdate
   rollingUpdate:
